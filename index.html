@@ -1362,8 +1362,8 @@ buildGrid();
       <p style="color:#7a746a;font-size:14px;margin:0 0 16px;">Cargando...</p>
       <div id="auth-fallback-links" style="display:none;">
         <p style="color:#7a746a;font-size:12px;margin:0 0 12px;">¿Tarda mucho? Accede directamente:</p>
-        <a href="https://accounts.pix2print.net/sign-up?redirect_url=https://pix2print.net" style="display:block;margin-bottom:8px;padding:10px;background:#c94f2a;color:white;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600;">Crear cuenta gratis</a>
-        <a href="https://accounts.pix2print.net/sign-in?redirect_url=https://pix2print.net" style="display:block;padding:10px;background:#f0ebe5;color:#1a1612;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600;">Iniciar sesión</a>
+        <a href="https://advanced-collie-24.clerk.accounts.dev/sign-up?redirect_url=https://pix2print.net" style="display:block;margin-bottom:8px;padding:10px;background:#c94f2a;color:white;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600;">Crear cuenta gratis</a>
+        <a href="https://advanced-collie-24.clerk.accounts.dev/sign-in?redirect_url=https://pix2print.net" style="display:block;padding:10px;background:#f0ebe5;color:#1a1612;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600;">Iniciar sesión</a>
       </div>
     </div>
     <script>setTimeout(function(){var f=document.getElementById("auth-fallback-links");if(f)f.style.display="block";},3000);</script>
@@ -1608,9 +1608,9 @@ function mountClerkForm(type, attempts) {
     // Fallback: redirect to Clerk hosted pages
     var returnUrl = encodeURIComponent(window.location.href);
     if (type === 'signup') {
-      window.location.href = 'https://accounts.pix2print.net/sign-up?redirect_url=' + returnUrl;
+      window.location.href = 'https://advanced-collie-24.clerk.accounts.dev/sign-up?redirect_url=' + returnUrl;
     } else {
-      window.location.href = 'https://accounts.pix2print.net/sign-in?redirect_url=' + returnUrl;
+      window.location.href = 'https://advanced-collie-24.clerk.accounts.dev/sign-in?redirect_url=' + returnUrl;
     }
     return;
   }
@@ -1646,9 +1646,9 @@ function mountClerkForm(type, attempts) {
     // If mounting fails, redirect to hosted pages
     var returnUrl = encodeURIComponent(window.location.href);
     if (type === 'signup') {
-      window.location.href = 'https://accounts.pix2print.net/sign-up?redirect_url=' + returnUrl;
+      window.location.href = 'https://advanced-collie-24.clerk.accounts.dev/sign-up?redirect_url=' + returnUrl;
     } else {
-      window.location.href = 'https://accounts.pix2print.net/sign-in?redirect_url=' + returnUrl;
+      window.location.href = 'https://advanced-collie-24.clerk.accounts.dev/sign-in?redirect_url=' + returnUrl;
     }
   }
 }
