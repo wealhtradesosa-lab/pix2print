@@ -2966,6 +2966,14 @@ var userPlan = 'free';
 var imagesUsed = 0;
 var FREE_LIMIT = 2;
 
+// Owner bypass — acceso ilimitado sin pagar
+var OWNER_EMAILS = ['santisosa@feelingcompany.com'];
+function isOwner(user) {
+  if (!user) return false;
+  var email = user.primaryEmailAddress ? user.primaryEmailAddress.emailAddress : '';
+  return OWNER_EMAILS.indexOf(email.toLowerCase()) > -1;
+}
+
 // CLERK INIT
 var isLocalDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
 
@@ -3020,9 +3028,15 @@ function updateAuthUI(user) {
     if (hero) hero.style.display = 'none';
     if (statusBar) statusBar.style.display = 'block';
 
-    // Load saved state
-    imagesUsed = parseInt(localStorage.getItem('px2_' + user.id) || '0');
-    userPlan = localStorage.getItem('px2_plan_' + user.id) || 'free';
+    // Owner bypass — plan ilimitado automático
+    if (isOwner(user)) {
+      userPlan = 'unlimited';
+      imagesUsed = 0;
+    } else {
+      // Load saved state
+      imagesUsed = parseInt(localStorage.getItem('px2_' + user.id) || '0');
+      userPlan = localStorage.getItem('px2_plan_' + user.id) || 'free';
+    }
 
     // Update status bar
     var emailEl = document.getElementById('user-email-display');
@@ -3455,6 +3469,15 @@ async function startCheckout(plan) {
     window._pendingCheckout = plan;
     openAuthModal('signup');
     toast('Regístrate para continuar con tu plan');
+    return;
+  }
+  // Owner bypass — no necesita pagar
+  if (isOwner(clerkUser)) {
+    userPlan = 'unlimited';
+    imagesUsed = 0;
+    toast('✅ Cuenta Owner — acceso ilimitado activado');
+    var hero = document.getElementById('hero-section');
+    if (hero) hero.style.display = 'none';
     return;
   }
 
