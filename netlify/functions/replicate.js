@@ -102,13 +102,30 @@ exports.handler = async function(event, context) {
         }
 
         // Any other model call (generic versioned)
-        const r = await fetch('https://api.replicate.com/v1/predictions', {
+        // Parse model:version format (e.g. "nightmareai/real-esrgan:42fed1c4...")
+        let callVersion = body.version;
+        let callModel = model;
+        if (!callVersion && model && model.includes(':')) {
+          const parts = model.split(':');
+          callModel = parts[0];
+          callVersion = parts[1];
+        }
+
+        const endpoint = callVersion
+          ? 'https://api.replicate.com/v1/predictions'
+          : `https://api.replicate.com/v1/models/${callModel}/predictions`;
+
+        const payload = callVersion
+          ? { version: callVersion, input }
+          : { input };
+
+        const r = await fetch(endpoint, {
           method: 'POST',
           headers: {
             'Authorization': `Token ${REPLICATE_TOKEN}`,
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify(body.version ? { version: body.version, input } : { model, input })
+          body: JSON.stringify(payload)
         });
 
         if (!r.ok) {
