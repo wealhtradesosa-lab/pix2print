@@ -28,6 +28,12 @@
             --radius: 14px;
             --radius-lg: 22px;
             --radius-sm: 8px;
+            --card: #131316;
+            --s3: 0 12px 40px rgba(0,0,0,.4);
+            --gold: #ffd700;
+            --muted: #8A8A96;
+            --terra: #4ADE80;
+            --muted2: #55555F;
             --font: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
             --ease: cubic-bezier(0.4, 0, 0.2, 1);
         }
@@ -865,7 +871,7 @@
 /* === APP FUNCTIONAL STYLES (dark adapted) === */
 
 /* STEP BAR */
-.stepbar{display:flex;align-items:center;max-width:580px;margin:0 auto;padding:24px 32px 0;}
+/* stepbar moved to app shell CSS */
 .si{display:flex;flex-direction:column;align-items:center;gap:5px;flex:1;position:relative;}
 .si:not(:last-child)::after{content:'';position:absolute;top:15px;left:calc(50% + 19px);right:calc(-50% + 19px);height:1px;background:#1E1E24;transition:background .4s;}
 .si.done:not(:last-child)::after,.si.act:not(:last-child)::after{background:#4ADE80;}
@@ -876,8 +882,8 @@
 .si.act .sl{color:#fff;font-weight:700;}
 .si.done .sl{color:#4ADE80;}
 
-.screen{display:none;padding:32px;max-width:1100px;margin:0 auto;animation:sIn .3s ease;}
-.screen.act{display:block;}
+/* screen moved to app shell CSS */
+/* screen.act moved to app shell CSS */
 @keyframes sIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
 .sh{font-family:'DM Sans',sans-serif;font-size:clamp(24px,3vw,32px);font-weight:700;margin-bottom:4px;letter-spacing:-.02em;color:#F2F2F2;}
 .ss{font-size:14px;color:#8A8A96;margin-bottom:28px;font-weight:300;line-height:1.6;}
@@ -1033,6 +1039,166 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 /* PROCESSING */
 .proc-wrap{display:none;max-width:520px;margin:0 auto;padding:60px 32px;text-align:center;}
 .proc-wrap.act{display:block;}
+
+/* ═══ APP SHELL ═══ */
+#landing-wrap {
+  transition: opacity .4s ease, transform .4s ease;
+}
+#landing-wrap.hidden {
+  opacity: 0;
+  transform: translateY(-20px);
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+  height: 0;
+  overflow: hidden;
+}
+#app-wrap {
+  min-height: 100vh;
+  background: #08080A;
+  padding-bottom: 60px;
+  animation: appIn .5s ease;
+}
+@keyframes appIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══ APP TOP BAR ═══ */
+.app-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 28px;
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  background: rgba(8,8,10,.95);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.app-topbar .atb-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #F2F2F2;
+  cursor: pointer;
+  text-decoration: none;
+}
+.app-topbar .atb-logo span {
+  background: #fff;
+  color: #000;
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 800;
+  font-style: italic;
+}
+.app-topbar .atb-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.app-topbar .atb-btn {
+  padding: 6px 16px;
+  border-radius: 100px;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all .2s;
+}
+.atb-btn.ghost {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,.12);
+  color: #aaa;
+}
+.atb-btn.ghost:hover { border-color: rgba(255,255,255,.3); color: #fff; }
+.atb-btn.primary {
+  background: #4ADE80;
+  border: none;
+  color: #000;
+  font-weight: 600;
+}
+.atb-btn.primary:hover { background: #22C55E; }
+
+/* ═══ SCREEN TRANSITIONS ═══ */
+.screen {
+  display: none;
+  padding: 32px;
+  max-width: 1100px;
+  margin: 0 auto;
+  animation: screenIn .35s ease;
+}
+.screen.act { display: block; }
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ═══ STEPBAR ENHANCEMENT ═══ */
+.stepbar {
+  display: flex;
+  align-items: center;
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 20px 32px 0;
+  position: relative;
+}
+.stepbar::before {
+  content: '';
+  position: absolute;
+  top: 36px;
+  left: 72px;
+  right: 72px;
+  height: 2px;
+  background: rgba(255,255,255,.06);
+  z-index: 0;
+}
+.si {
+  flex: 1;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+  cursor: default;
+}
+.sc {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 6px;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: 'DM Sans', sans-serif;
+  background: rgba(255,255,255,.06);
+  color: #666;
+  border: 2px solid transparent;
+  transition: all .3s ease;
+}
+.si.act .sc {
+  background: #4ADE80;
+  color: #000;
+  border-color: #4ADE80;
+  box-shadow: 0 0 16px rgba(74,222,128,.3);
+}
+.si.done .sc {
+  background: rgba(74,222,128,.15);
+  color: #4ADE80;
+  border-color: rgba(74,222,128,.3);
+}
+.sl {
+  font-size: 11px;
+  font-family: 'DM Sans', sans-serif;
+  color: #555;
+  font-weight: 500;
+  transition: color .3s;
+}
+.si.act .sl { color: #F2F2F2; font-weight: 600; }
+.si.done .sl { color: #4ADE80; }
+
 @keyframes spin{to{transform:rotate(360deg);}}
 .pbar-wrap{height:4px;background:#1E1E24;border-radius:2px;overflow:hidden;margin-bottom:8px;}
 .pbar-fill{height:100%;background:linear-gradient(90deg,#fff,#888);border-radius:2px;width:0%;transition:width .15s linear;}
@@ -1113,18 +1279,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
         <div><div style="font-weight:700;font-size:14px;">Pack 5</div><div style="font-size:11px;color:#8A8A96;">5 imágenes · Sin suscripción</div></div>
         <button onclick="startCheckout('pack5')" style="padding:8px 16px;background:#fff;color:#000;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">$8</button>
       </div>
-      <div style="background:#08080A;border:2px solid var(--terra);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;position:relative;">
-        <div style="position:absolute;top:-8px;left:12px;background:#fff;color:white;font-size:9px;font-weight:700;padding:2px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.05em;">Más popular</div>
+      <div style="background:#08080A;border:2px solid #4ADE80;border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;position:relative;">
+        <div style="position:absolute;top:-8px;left:12px;background:#4ADE80;color:#000;font-size:9px;font-weight:700;padding:2px 8px;border-radius:5px;text-transform:uppercase;letter-spacing:.05em;">Más popular</div>
         <div><div style="font-weight:700;font-size:14px;">Pack 10</div><div style="font-size:11px;color:#8A8A96;">10 imágenes · Mejor precio</div></div>
-        <button onclick="startCheckout('pack10')" style="padding:8px 16px;background:#fff;color:white;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">$14</button>
+        <button onclick="startCheckout('pack10')" style="padding:8px 16px;background:#4ADE80;color:#000;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">$14</button>
       </div>
       <div style="background:#08080A;border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
         <div><div style="font-weight:700;font-size:14px;">Pro</div><div style="font-size:11px;color:#8A8A96;">Ilimitado · 8× upscale</div></div>
-        <button onclick="startCheckout('pro')" style="padding:8px 16px;background:#fff;color:#000;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">$19/mo</button>
+        <button onclick="startCheckout('pro')" style="padding:8px 16px;background:#fff;color:#000;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">$9/mes</button>
       </div>
       <div style="background:#08080A;border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
         <div><div style="font-weight:700;font-size:14px;">Unlimited</div><div style="font-size:11px;color:#8A8A96;">Sin límite · 10× upscale</div></div>
-        <button onclick="startCheckout('unlimited')" style="padding:8px 16px;background:#fff;color:#000;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">$49/mo</button>
+        <button onclick="startCheckout('unlimited')" style="padding:8px 16px;background:#fff;color:#000;border:none;border-radius:7px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">$29/mes</button>
       </div>
     </div>
     <div style="text-align:center;font-size:12px;color:#8A8A96;">Pago seguro vía Stripe · Cancela cuando quieras</div>
@@ -1148,9 +1314,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 </div>
 
 
-<!-- ════════════════════════════════════════════════════
-     LANDING PAGE (v2 design)
-════════════════════════════════════════════════════ -->
+<div id="landing-wrap">
+<div id="landing-page">
 <!-- NAV -->
     <nav>
         <div class="nav-inner">
@@ -1444,6 +1609,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
             </div>
         </div>
     </footer>
+</div><!-- /landing-page -->
 
     <script>
         // ── COMPARISON SLIDER ──
@@ -1522,16 +1688,29 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
     </script>
 
 
+</div><!-- /landing-wrap -->
+
 <!-- ════════════════════════════════════════════════════
      APP TOOL SECTION (v7 functional core)
 ════════════════════════════════════════════════════ -->
+<div id="app-wrap" style="display:none;">
 <div id="tool-section"></div>
+<div class="app-topbar">
+  <a class="atb-logo" onclick="exitApp()">
+    <span>P</span> Pix2Print
+  </a>
+  <div class="atb-right">
+    <button id="restart-btn2" class="atb-btn ghost" onclick="resetAll()" style="display:none;">↩ Reiniciar</button>
+    <div id="clerk-nav-btn2" style="display:inline-flex;align-items:center;"></div>
+    <button class="atb-btn primary" onclick="openUpgradeModal()">⚡ Upgrade</button>
+  </div>
+</div>
 <!-- STEPS -->
 <div class="stepbar">
   <div class="si act" id="si1"><div class="sc">1</div><div class="sl">Subir imagen</div></div>
-  <div class="si" id="si2"><div class="sc">2</div><div class="sl">Elegir producto</div></div>
-  <div class="si" id="si3"><div class="sc">3</div><div class="sl">Mejorar imagen</div></div>
-  <div class="si" id="si4"><div class="sc">4</div><div class="sl">Descargar</div></div>
+  <div class="si" id="si2" style="display:none;"><div class="sc">2</div><div class="sl">Producto</div></div>
+  <div class="si" id="si3"><div class="sc">2</div><div class="sl">Mejorar resolución</div></div>
+  <div class="si" id="si4"><div class="sc">3</div><div class="sl">Descargar</div></div>
 </div>
 
 <!-- Hidden work canvases -->
@@ -1571,7 +1750,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
       </div>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-outline btn-sm" onclick="document.getElementById('file-inp').click()">Cambiar</button>
-        <button class="btn btn-terra" onclick="goTo(2)">Elegir producto →</button>
+        <button class="btn btn-terra" onclick="autoEnhance()">⚡ Mejorar resolución →</button>
       </div>
     </div>
   </div>
@@ -1781,8 +1960,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
   </div>
 
   <div class="nav-actions">
-    <button class="btn btn-outline" onclick="goTo(2)">← Volver</button>
-    <button class="btn btn-terra btn-lg" onclick="startProc()">✓ Generar archivo final →</button>
+    <button class="btn btn-outline" onclick="goTo(1)">← Cambiar imagen</button>
+    <button class="btn btn-terra btn-lg" onclick="startProc()">✓ Descargar resultado →</button>
   </div>
 </div>
 
@@ -1871,6 +2050,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 <!-- ════════════════════════════════════════════════════
      MAIN APPLICATION JAVASCRIPT
 ════════════════════════════════════════════════════ -->
+</div><!-- /app-wrap -->
+
 <script>
 /* ════════════════════════════════════
    PRESETS DB
@@ -1913,7 +2094,7 @@ function toast(msg){const e=document.getElementById('toast-el');e.textContent=ms
 /* ════════════════════════════════════
    UPLOAD
 ════════════════════════════════════ */
-function handleFile(e){if(e.target.files[0])loadImg(e.target.files[0]);}
+function handleFile(e){if(e.target.files[0]){loadImg(e.target.files[0]);showApp();}}
 function dropFile(e){e.preventDefault();document.getElementById('upload-zone').classList.remove('over');if(e.dataTransfer.files[0])loadImg(e.dataTransfer.files[0]);}
 function loadImg(file){
   ST.fileBytes=file.size;
@@ -1935,6 +2116,7 @@ function loadImg(file){
       document.getElementById('m-fmt').textContent=file.type.split('/')[1].toUpperCase();
       document.getElementById('m-qual').textContent=qual;
       document.getElementById('restart-btn').style.display='flex';
+      var rb2=document.getElementById('restart-btn2');if(rb2)rb2.style.display='inline-block';
     };
     img.src=ev.target.result;
   };
@@ -1974,27 +2156,48 @@ function updSzInfo(){
 }
 function selPl(el,p){ST.placement=p;document.querySelectorAll('.pl-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');}
 
+
+/* ════════════════════════════════════
+   AUTO ENHANCE — Skip product selection, go straight to upscale
+════════════════════════════════════ */
+function autoEnhance(){
+  // Auto-select a generic photo preset
+  if(!ST.preset){
+    ST.preset={id:'photo-hd',cat:'photo',ico:'📷',name:'Foto HD',w:30,h:20,dpi:300,bleed:false,transp:false,note:'Mejora general'};
+  }
+  ST.scale=4; // Default 4x upscale
+  ST.dpi=300;
+  // Go to enhancement screen and auto-run
+  goTo(3);
+  // Small delay then auto-trigger upscale
+  setTimeout(function(){ runUpscale(); }, 600);
+}
+
 /* ════════════════════════════════════
    NAVIGATION
 ════════════════════════════════════ */
 function goTo(n){
   document.querySelectorAll('.screen,.proc-wrap').forEach(s=>s.classList.remove('act'));
   for(let i=1;i<=4;i++){
-    const si=document.getElementById(`si${i}`);
+    const si=document.getElementById('si'+i);
     si.classList.remove('act','done');
     if(i<n)si.classList.add('done');else if(i===n)si.classList.add('act');
   }
-  const sc=document.getElementById(`sc${n}`);if(sc)sc.classList.add('act');
+  const sc=document.getElementById('sc'+n);if(sc)sc.classList.add('act');
   if(n===2)buildGrid();
   if(n===3){buildAnalysis();initCompare();buildEditor();}
-  window.scrollTo({top:0,behavior:'smooth'});
+  // No scroll - screens swap in place
+  // Show/hide restart btn
+  var rb=document.getElementById('restart-btn');if(rb)rb.style.display=n>1?'inline-block':'none';
+  var rb2=document.getElementById('restart-btn2');if(rb2)rb2.style.display=n>1?'inline-block':'none';
 }
 
 /* ════════════════════════════════════
    ANALYSIS
 ════════════════════════════════════ */
 function buildAnalysis(){
-  if(!ST.preset||!ST.imgW)return;
+  if(!ST.imgW)return;
+  if(!ST.preset)ST.preset={id:'photo-hd',cat:'photo',ico:'📷',name:'Foto HD',w:30,h:20,dpi:300,bleed:false,transp:false,note:'Mejora general'};
   const p=ST.preset;
   const sd=p.shirt?(SIZES[ST.shirtSz]||{w:p.w,h:p.h}):{w:p.w||20,h:p.h||20};
   const I=2.54;
@@ -2121,19 +2324,24 @@ var OWNER_EMAILS=['santisosa@feelingcompany.com'];
 function isOwner(){var u=clerkUser||window._demoUser;if(!u)return false;var em=(u.primaryEmailAddress&&u.primaryEmailAddress.emailAddress)||u.email||'';return OWNER_EMAILS.indexOf(em.toLowerCase())>-1;}
 function updateAuthUI(user){clerkUser=user;if(user){var em=(user.primaryEmailAddress&&user.primaryEmailAddress.emailAddress)||'';if(isOwner()){window._imgCount=0;window._userPlan='unlimited';console.log('👑 Owner mode: unlimited plan activated');}}else{window._userPlan='free';}}
 function waitForClerk(){if(window.location.hostname==='localhost'||window.location.hostname==='127.0.0.1'){window._demoUser={id:'demo',email:'demo@localhost'};return;}var t=0;var interval=setInterval(function(){t++;if(window.Clerk){clearInterval(interval);initClerk();}if(t>50)clearInterval(interval);},200);}
-async function initClerk(){try{await window.Clerk.load();var navMount=document.getElementById('clerk-nav-btn');if(navMount)window.Clerk.mountUserButton(navMount);window.Clerk.addListener(function(){updateAuthUI(window.Clerk.user);});updateAuthUI(window.Clerk.user);}catch(e){console.log('Clerk error:',e);}}
+async function initClerk(){try{await window.Clerk.load();var navMount=document.getElementById('clerk-nav-btn');if(navMount)window.Clerk.mountUserButton(navMount);
+    var navMount2=document.getElementById('clerk-nav-btn2');if(navMount2)window.Clerk.mountUserButton(navMount2);window.Clerk.addListener(function(){updateAuthUI(window.Clerk.user);});updateAuthUI(window.Clerk.user);}catch(e){console.log('Clerk error:',e);}}
 waitForClerk();
 
 var STRIPE_PRICES={pack5:'price_1T4ib1GstLpSKLSjvp1YECYR',pack10:'price_1T4id2GstLpSKLSjPw3cDlKy',pro:'price_1T2JH7GstLpSKLSj7izBAXHp',unlimited:'price_1T2JIDGstLpSKLSjuHRP9K97'};
 async function startCheckout(planKey){
   if(isOwner()){toast('👑 Owner — acceso ilimitado activo');closeUpgradeModal();return;}
   var priceId=STRIPE_PRICES[planKey];if(!priceId){toast('Plan no válido');return;}
+  // Determine Stripe mode: one-time packs = payment, monthly plans = subscription
+  var mode=(planKey==='pro'||planKey==='unlimited')?'subscription':'payment';
+  var email='';
+  if(clerkUser&&clerkUser.primaryEmailAddress)email=clerkUser.primaryEmailAddress.emailAddress||'';
   try{
     toast('⏳ Preparando pago…');
-    var r=await fetch('/.netlify/functions/stripe-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({priceId:priceId,successUrl:window.location.origin+'?success=1',cancelUrl:window.location.href})});
+    var r=await fetch('/.netlify/functions/stripe-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({priceId:priceId,mode:mode,email:email,successUrl:window.location.origin+'?success=1',cancelUrl:window.location.href})});
     var d=await r.json();
     if(d.url)window.location.href=d.url;
-    else toast('Error al conectar con Stripe');
+    else toast('Error: '+(d.error||'No se pudo conectar con Stripe'));
   }catch(e){toast('Error: '+e.message);}
 }
 
@@ -2142,6 +2350,12 @@ async function startCheckout(planKey){
 ════════════════════════════════════ */
 async function runUpscale(){
   if(!ST.src){toast('Primero sube una imagen');return;}
+  // Credit check (owner bypasses)
+  if(!isOwner()){
+    var used=parseInt(localStorage.getItem('p2p_used')||'0');
+    var limit=window._userPlan==='unlimited'?9999:window._userPlan==='pro'?50:(parseInt(localStorage.getItem('p2p_credits')||'5'));
+    if(used>=limit){openUpgradeModal();toast('⚡ Necesitas más créditos para continuar');return;}
+  }
   var btn=document.getElementById('upscale-btn');
   btn.disabled=true;btn.textContent='⏳ Procesando…';
   document.getElementById('not-proc').innerHTML=`
@@ -2173,6 +2387,8 @@ async function runUpscale(){
     var outUrl=Array.isArray(pred.output)?pred.output[0]:pred.output;
     if(!outUrl)throw new Error('No output');
     ST.enhancedURL=outUrl;ST.beforeURL=srcUrl;ST.upscaleDone=true;
+    // Increment usage counter (owner doesn't count)
+    if(!isOwner()){var used=parseInt(localStorage.getItem('p2p_used')||'0');localStorage.setItem('p2p_used',String(used+1));}
     showUpscaleResult();
   }catch(e){
     console.error('Upscale error:',e);
@@ -2235,7 +2451,7 @@ async function processCanvasFallback(srcUrl){
       var tmp=document.createElement('canvas');tmp.width=smW;tmp.height=smH;
       tmp.getContext('2d').drawImage(srcImg,0,0,smW,smH);
       cxb.imageSmoothingEnabled=false;cxb.drawImage(tmp,0,0,oW,oH);
-      ST.beforeURL=cbef.toDataURL('image/jpeg',.85);
+      ST.beforeURL=ST.originalURL; // Use actual original, not pixelated version
       // after: high quality
       var caft=document.getElementById('wc-after');
       caft.width=tW;caft.height=tH;
@@ -2255,22 +2471,42 @@ async function processCanvasFallback(srcUrl){
 
 function showUpscaleResult(){
   const a=ST._a;
-  // Update compare
-  document.getElementById('img-before').src=ST.beforeURL;
+  // BEFORE = original image (always use the original upload)
+  // AFTER = enhanced image from Real-ESRGAN or canvas
+  var beforeSrc = ST.originalURL; // Always the original upload
+  var afterSrc = ST.enhancedURL;
+  
+  document.getElementById('img-before').src=beforeSrc;
   document.getElementById('img-before').style.filter='none';
-  document.getElementById('img-after').src=ST.enhancedURL;
+  document.getElementById('img-after').src=afterSrc;
   document.getElementById('img-after').style.filter='none';
-  document.getElementById('r-img-before').src=ST.beforeURL;
-  document.getElementById('r-img-after').src=ST.enhancedURL;
+  document.getElementById('r-img-before').src=beforeSrc;
+  document.getElementById('r-img-after').src=afterSrc;
 
   document.getElementById('not-proc').style.display='none';
   // Update mockup with enhanced image
   const de=document.getElementById('design-el');
-  if(de)de.querySelector('img').src=ST.enhancedURL;
+  if(de&&de.querySelector('img'))de.querySelector('img').src=afterSrc;
 
   const btn=document.getElementById('upscale-btn');
-  btn.disabled=false;btn.textContent='✓ Mejorado — repetir';
-  toast(`✅ ${ST.scale}× completado · ${a?.outW?.toLocaleString()}×${a?.outH?.toLocaleString()}px`);
+  if(btn){btn.disabled=false;btn.textContent='✓ Mejorado — repetir';}
+  
+  // Show enhancement stats
+  var enhImg=new Image();
+  enhImg.onload=function(){
+    var origRes=ST.imgW+'×'+ST.imgH;
+    var newRes=enhImg.naturalWidth+'×'+enhImg.naturalHeight;
+    var improvement=Math.round((enhImg.naturalWidth*enhImg.naturalHeight)/(ST.imgW*ST.imgH)*100);
+    toast('✅ '+ST.scale+'× completado · '+newRes+'px ('+improvement+'% más píxeles)');
+    // Update chips
+    var co=document.getElementById('chip-orig');if(co)co.textContent=origRes;
+    var cn=document.getElementById('chip-new');if(cn)cn.textContent=newRes;
+    var ro=document.getElementById('r-chip-orig');if(ro)ro.textContent=origRes;
+    var rn=document.getElementById('r-chip-new');if(rn)rn.textContent=newRes;
+  };
+  enhImg.src=afterSrc;
+  // Auto-proceed to result
+  setTimeout(function(){ startProc(); }, 1200);
 }
 
 /* ════════════════════════════════════
@@ -2436,7 +2672,7 @@ function applyZoom(){const s=document.getElementById('canvas-stage');s.style.tra
    PROCESSING + RESULT
 ════════════════════════════════════ */
 function startProc(){
-  if(!ST.upscaleDone){toast('⚡ Primero presiona "Mejorar ahora" para aplicar el upscale');return;}
+  if(!ST.upscaleDone){return;}
   const a=ST._a||{recScale:4,outW:ST.imgW*4,outH:ST.imgH*4,dpiPct:60,sd:{w:20,h:9}};
   const p=ST.preset;
   document.querySelectorAll('.screen,.proc-wrap').forEach(s=>s.classList.remove('act'));
@@ -2445,7 +2681,6 @@ function startProc(){
   document.getElementById('proc-info').textContent=`${p.name}${p.shirt?' · '+ST.shirtSz:''} · ${ST.scale}× · ${ST.dpi} DPI`;
   document.getElementById('pl4').style.display=ST.bgRemove?'flex':'none';
   document.querySelectorAll('.pl').forEach(l=>l.classList.remove('done','cur'));
-  window.scrollTo({top:0,behavior:'smooth'});
 
   let pct=0,step=0;
   const logIds=['pl1','pl2','pl3',ST.bgRemove?'pl4':'pl5','pl5','pl6'];
@@ -2523,11 +2758,18 @@ function selFmt(el,fmt){
    RESET
 ════════════════════════════════════ */
 function resetAll(){
+  // Return to landing page
+  var landing=document.getElementById('landing-wrap');
+  var app=document.getElementById('app-wrap');
+  if(app)app.style.display='none';
+  if(landing)landing.classList.remove('hidden');
+  window.scrollTo({top:0, behavior:'smooth'});
   Object.assign(ST,{src:null,imgW:0,imgH:0,fileBytes:0,originalURL:null,enhancedURL:null,beforeURL:null,preset:null,shirtSz:'M',placement:'front',bgRemove:false,guides:true,dpi:300,scale:4,zoom:1,fmt:'PNG',upscaleDone:false,drag:{on:false},rsz:{on:false},_a:null});
   document.getElementById('upload-zone').style.display='block';
   document.getElementById('uc-card').style.display='none';
   document.getElementById('file-inp').value='';
   document.getElementById('restart-btn').style.display='none';
+  var rb2=document.getElementById('restart-btn2');if(rb2)rb2.style.display='none';
   document.getElementById('s2btn').disabled=true;
   const btn=document.getElementById('upscale-btn');
   if(btn){btn.disabled=false;btn.textContent='⚡ Mejorar ahora';}
@@ -2577,10 +2819,22 @@ buildGrid();
 
 <!-- Bridge: Connect v2 landing page to v7 app functionality -->
 <script>
-// showApp: scroll to tool section and show it
+// ═══ APP SHELL NAVIGATION ═══
+
 function showApp(){
-  var ts = document.getElementById('tool-section');
-  if(ts) ts.scrollIntoView({behavior:'smooth',block:'start'});
+  var landing = document.getElementById('landing-wrap');
+  var app = document.getElementById('app-wrap');
+  if(landing) landing.classList.add('hidden');
+  if(app) { app.style.display='block'; }
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+function exitApp(){
+  var landing = document.getElementById('landing-wrap');
+  var app = document.getElementById('app-wrap');
+  if(app) app.style.display='none';
+  if(landing) landing.classList.remove('hidden');
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
 // Override v2's upload area to trigger v7's file processing
@@ -2590,12 +2844,9 @@ function showApp(){
   var v7FileInput = document.getElementById('file-inp');
   
   if(v2Upload && v7FileInput){
-    // Remove v2's click handler by cloning
     var newUpload = v2Upload.cloneNode(true);
     v2Upload.parentNode.replaceChild(newUpload, v2Upload);
     v2Upload = newUpload;
-    
-    // Also re-get the file input inside
     v2FileInput = v2Upload.querySelector('input[type="file"]');
     
     v2Upload.addEventListener('click', function(e){
@@ -2617,6 +2868,7 @@ function showApp(){
       if(e.dataTransfer.files[0] && e.dataTransfer.files[0].type.startsWith('image/')){
         loadImg(e.dataTransfer.files[0]);
         showApp();
+        setTimeout(function(){ goTo(1); },100);
       }
     });
     
@@ -2625,14 +2877,10 @@ function showApp(){
         if(e.target.files[0]){
           loadImg(e.target.files[0]);
           showApp();
+          setTimeout(function(){ goTo(1); },100);
         }
       });
     }
-  }
-  
-  // Override v2 pricing handlePurchase for Stripe integration
-  if(typeof window.handlePurchase !== 'undefined'){
-    // Already handled by v7's stripe checkout
   }
 })();
 </script>
