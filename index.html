@@ -2346,10 +2346,19 @@ async function startCheckout(planKey){
   try{
     toast('⏳ Preparando pago…');
     var r=await fetch('/.netlify/functions/stripe-checkout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({priceId:priceId,mode:mode,email:email,successUrl:window.location.origin+'?success=1',cancelUrl:window.location.href})});
+    if(r.status===404){toast('⚠️ Función de pago no encontrada. Verifica que stripe-checkout.js está en netlify/functions/');return;}
     var d=await r.json();
     if(d.url)window.location.href=d.url;
-    else toast('Error: '+(d.error||'No se pudo conectar con Stripe'));
-  }catch(e){toast('Error: '+e.message);}
+    else{
+      console.error('Stripe error:',d);
+      if(d.error&&d.error.indexOf('STRIPE_SECRET_KEY')>-1) toast('⚠️ Configura STRIPE_SECRET_KEY en Netlify → Site settings → Environment variables');
+      else toast('Error: '+(d.error||'No se pudo conectar con Stripe'));
+    }
+  }catch(e){
+    console.error('Checkout error:',e);
+    if(e.message&&e.message.indexOf('Failed to fetch')>-1) toast('⚠️ No se pudo conectar al servidor. ¿Estás en localhost?');
+    else toast('Error: '+e.message);
+  }
 }
 
 /* ════════════════════════════════════
