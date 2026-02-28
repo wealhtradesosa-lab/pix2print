@@ -1242,7 +1242,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 .btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;box-shadow:none!important;}
 
 /* TOAST */
-.toast{position:fixed;bottom:22px;right:22px;background:#fff;color:#000;padding:11px 16px;border-radius:9px;font-size:13px;z-index:9999;transform:translateY(60px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:280px;box-shadow:0 12px 48px rgba(0,0,0,.4);}
+.toast{position:fixed;bottom:22px;right:22px;background:#fff;color:#000;padding:11px 16px;border-radius:9px;font-size:13px;z-index:9999;transform:translateY(60px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);max-width:280px;box-shadow:0 12px 48px rgba(0,0,0,.4);pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;pointer-events:auto;}
+.btn-price:active{transform:scale(.95)!important;opacity:.8;}
+.price-card{transition:transform .2s,box-shadow .2s;cursor:pointer;}
+.price-card:active{transform:scale(.97);}
 
 /* RESPONSIVE */
 @media(max-width:860px){
@@ -2052,6 +2056,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 ════════════════════════════════════════════════════ -->
 </div><!-- /app-wrap -->
 
+<!-- Global toast (outside both wrappers so always visible) -->
+<div class="toast" id="global-toast"></div>
+
 <script>
 /* ════════════════════════════════════
    PRESETS DB
@@ -2089,7 +2096,7 @@ const ST={
 ════════════════════════════════════ */
 function fmtBytes(b){return b>1048576?(b/1048576).toFixed(1)+' MB':Math.round(b/1024)+' KB';}
 let _tt;
-function toast(msg){const e=document.getElementById('toast-el');e.textContent=msg;e.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>e.classList.remove('show'),3200);}
+function toast(msg){var appWrap=document.getElementById('app-wrap');var useGlobal=!appWrap||appWrap.style.display==='none';var e=useGlobal?document.getElementById('global-toast'):document.getElementById('toast-el');if(!e)e=document.getElementById('global-toast');e.textContent=msg;e.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>e.classList.remove('show'),3200);}
 
 /* ════════════════════════════════════
    UPLOAD
@@ -2880,13 +2887,201 @@ function closeAuthModal(){var m=document.getElementById('auth-modal');if(m)m.sty
 function switchAuthPanel(mode){openAuthModal(mode);}
 
 /* ════════════════════════════════════
-   LANGUAGE
+   LANGUAGE — Full i18n System
 ════════════════════════════════════ */
+var _currentLang='es';
+var _i18n=[
+  // NAV
+  {s:'#navLinks a[href="#como-funciona"]',es:'Cómo funciona',en:'How it works'},
+  {s:'#navLinks a[href="#funcionalidades"]',es:'Funcionalidades',en:'Features'},
+  {s:'#navLinks a[href="#precios"]',es:'Precios',en:'Pricing'},
+  {s:'#signin-btn',es:'Iniciar sesión',en:'Sign in'},
+  {s:'#restart-btn',es:'↩ Reiniciar',en:'↩ Reset'},
+  // HERO
+  {s:'.hero h1',es:'Fotos en <span class="grad">alta resolución</span>, en segundos',en:'Photos in <span class="grad">high resolution</span>, in seconds',html:true},
+  {s:'.hero .container > p',es:'Mejora la calidad de tus imágenes con inteligencia artificial. Escala hasta 4x sin perder detalle.',en:'Enhance your image quality with artificial intelligence. Upscale up to 4x without losing detail.'},
+  // STATS
+  {s:'.stat-item:nth-child(1) .stat-label',es:'Escalado máximo',en:'Max upscale'},
+  {s:'.stat-item:nth-child(2) .stat-label',es:'Tiempo de proceso',en:'Processing time'},
+  {s:'.stat-item:nth-child(3) .stat-label',es:'Automático con IA',en:'AI-powered'},
+  // HOW IT WORKS
+  {s:'#como-funciona .section-label',es:'Proceso',en:'Process'},
+  {s:'#como-funciona .section-title',es:'Tres pasos. Resultado profesional.',en:'Three steps. Professional results.'},
+  {s:'#como-funciona .section-subtitle',es:'Sin configuración, sin curva de aprendizaje. Sube tu foto y deja que la IA haga el trabajo.',en:'No setup, no learning curve. Upload your photo and let AI do the work.'},
+  {s:'.step-card:nth-child(1) .step-title',es:'Sube tu imagen',en:'Upload your image'},
+  {s:'.step-card:nth-child(1) .step-desc',es:'Arrastra y suelta tu foto o selecciónala desde tu dispositivo. Aceptamos JPG, PNG y WebP.',en:'Drag and drop your photo or select it from your device. We accept JPG, PNG and WebP.'},
+  {s:'.step-card:nth-child(2) .step-title',es:'La IA la mejora',en:'AI enhances it'},
+  {s:'.step-card:nth-child(2) .step-desc',es:'Real-ESRGAN analiza tu imagen pixel por pixel y reconstruye detalles a resolución 4× mayor.',en:'Real-ESRGAN analyzes your image pixel by pixel and reconstructs details at 4× higher resolution.'},
+  {s:'.step-card:nth-child(3) .step-title',es:'Descarga y usa',en:'Download and use'},
+  {s:'.step-card:nth-child(3) .step-desc',es:'Obtén tu imagen mejorada lista para impresión en gran formato, redes sociales o cualquier proyecto.',en:'Get your enhanced image ready for large format printing, social media or any project.'},
+  // FEATURES
+  {s:'#funcionalidades .section-label',es:'Tecnología',en:'Technology'},
+  {s:'#funcionalidades .section-title',es:'Diseñado para resultados reales',en:'Designed for real results'},
+  {s:'#funcionalidades .section-subtitle',es:'Cada detalle optimizado para la mejor calidad de imagen posible.',en:'Every detail optimized for the best possible image quality.'},
+  {s:'.feature-card:nth-child(1) .feature-title',es:'Escalado 4× inteligente',en:'Smart 4× upscaling'},
+  {s:'.feature-card:nth-child(1) .feature-desc',es:'Cuadruplica la resolución conservando nitidez, textura y color con precisión profesional.',en:'Quadruple the resolution while preserving sharpness, texture and color with professional precision.'},
+  {s:'.feature-card:nth-child(2) .feature-title',es:'Proceso ultrarrápido',en:'Ultra-fast processing'},
+  {s:'.feature-card:nth-child(2) .feature-desc',es:'Resultados en menos de 30 segundos. Infraestructura en la nube, sin depender de tu hardware.',en:'Results in under 30 seconds. Cloud infrastructure, no hardware dependency.'},
+  {s:'.feature-card:nth-child(3) .feature-title',es:'Listo para imprimir',en:'Print-ready'},
+  {s:'.feature-card:nth-child(3) .feature-desc',es:'Archivos de alta resolución aptos para gran formato, lienzos, vinilos y fotolibros.',en:'High resolution files suitable for large format, canvas, vinyl and photo books.'},
+  {s:'.feature-card:nth-child(4) .feature-title',es:'Seguro y privado',en:'Safe and private'},
+  {s:'.feature-card:nth-child(4) .feature-desc',es:'Tus imágenes se procesan de forma segura y se eliminan automáticamente tras la descarga.',en:'Your images are processed securely and automatically deleted after download.'},
+  // PRICING
+  {s:'#precios .section-label',es:'Precios',en:'Pricing'},
+  {s:'#precios .section-title',es:'Elige tu plan',en:'Choose your plan'},
+  {s:'#precios .section-subtitle',es:'Comienza gratis. Escala cuando lo necesites.',en:'Start free. Scale when you need it.'},
+  {s:'.pricing-divider span',es:'Suscripciones mensuales',en:'Monthly subscriptions'},
+  // Free plan
+  {s:'.pricing-grid .price-card:nth-child(1) .price-desc',es:'Para probar la herramienta',en:'Try the tool'},
+  {s:'.pricing-grid .price-card:nth-child(1) .price-period',es:'Sin costo',en:'No cost'},
+  // Pack 5
+  {s:'.pricing-grid .price-card:nth-child(2) .price-desc',es:'Paquete ideal para empezar',en:'Ideal starter pack'},
+  {s:'.pricing-grid .price-card:nth-child(2) .price-period',es:'USD / pago único',en:'USD / one-time'},
+  // Pack 10
+  {s:'.pricing-grid .price-card:nth-child(3) .price-desc',es:'Más fotos, mejor precio',en:'More photos, better price'},
+  {s:'.pricing-grid .price-card:nth-child(3) .price-period',es:'USD / pago único',en:'USD / one-time'},
+  // Pro
+  {s:'.pricing-grid-sub .price-card:nth-child(1) .price-desc',es:'Para creadores y profesionales',en:'For creators and professionals'},
+  {s:'.pricing-grid-sub .price-card:nth-child(1) .price-period',es:'USD / mes',en:'USD / month'},
+  // Business
+  {s:'.pricing-grid-sub .price-card:nth-child(2) .price-desc',es:'Para equipos y agencias',en:'For teams and agencies'},
+  {s:'.pricing-grid-sub .price-card:nth-child(2) .price-period',es:'USD / mes',en:'USD / month'},
+  // UPLOAD
+  {s:'#subir .section-label',es:'Comenzar',en:'Get started'},
+  {s:'#subir .section-title',es:'Mejora tu primera foto ahora',en:'Enhance your first photo now'},
+  {s:'.upload-title',es:'Arrastra tu imagen aquí',en:'Drag your image here'},
+  {s:'.upload-subtitle',es:'o haz clic para seleccionar archivo',en:'or click to select a file'},
+  // CTA
+  {s:'.cta-title',es:'La calidad que tus fotos merecen',en:'The quality your photos deserve'},
+  {s:'.cta-subtitle',es:'Empieza gratis. Sin tarjeta de crédito. Sin compromiso.',en:'Start free. No credit card. No commitment.'},
+  // FOOTER
+  {s:'.footer-copy',es:'© 2025 Pix2Print. Todos los derechos reservados.',en:'© 2025 Pix2Print. All rights reserved.'},
+  {s:'.footer-links a[href="#como-funciona"]',es:'Cómo funciona',en:'How it works'},
+  {s:'.footer-links a[href="#precios"]',es:'Precios',en:'Pricing'},
+  {s:'.footer-links a[href="#"]:nth-child(3) a, .footer-links li:nth-child(3) a',es:'Términos',en:'Terms'},
+  {s:'.footer-links li:nth-child(4) a',es:'Privacidad',en:'Privacy'}
+];
+
+/* Feature list items translation */
+var _i18nLists={
+  '.pricing-grid .price-card:nth-child(1) .price-features':{
+    es:['3 imágenes por mes','Escalado hasta 2×','Formatos JPG y PNG'],
+    en:['3 images per month','Upscale up to 2×','JPG and PNG formats']
+  },
+  '.pricing-grid .price-card:nth-child(2) .price-features':{
+    es:['5 imágenes','Escalado hasta 4×','Sin marca de agua'],
+    en:['5 images','Upscale up to 4×','No watermark']
+  },
+  '.pricing-grid .price-card:nth-child(3) .price-features':{
+    es:['10 imágenes','Escalado hasta 4×','Sin marca de agua','Procesamiento prioritario'],
+    en:['10 images','Upscale up to 4×','No watermark','Priority processing']
+  },
+  '.pricing-grid-sub .price-card:nth-child(1) .price-features':{
+    es:['50 imágenes por mes','Escalado hasta 4×','Procesamiento prioritario','Sin marca de agua'],
+    en:['50 images per month','Upscale up to 4×','Priority processing','No watermark']
+  },
+  '.pricing-grid-sub .price-card:nth-child(2) .price-features':{
+    es:['Imágenes ilimitadas','Escalado hasta 4×','API de integración','Soporte prioritario'],
+    en:['Unlimited images','Upscale up to 4×','Integration API','Priority support']
+  }
+};
+
+/* Buttons that need innerHTML preserved (have SVGs) */
+var _i18nBtns=[
+  {s:'.hero-actions .btn-primary',es:'Mejorar mi foto',en:'Enhance my photo',hasSvg:true},
+  {s:'.hero-actions .btn-secondary',es:'Ver cómo funciona',en:'See how it works'},
+  {s:'.btn-nav',es:'Comenzar gratis',en:'Start free',hasSvg:true},
+  {s:'.pricing-grid .price-card:nth-child(1) .btn-price',es:'Comenzar gratis',en:'Start free'},
+  {s:'.pricing-grid .price-card:nth-child(2) .btn-price',es:'Comprar paquete',en:'Buy pack'},
+  {s:'.pricing-grid .price-card:nth-child(3) .btn-price',es:'Comprar paquete',en:'Buy pack'},
+  {s:'.pricing-grid-sub .price-card:nth-child(1) .btn-price',es:'Elegir Pro',en:'Choose Pro'},
+  {s:'.pricing-grid-sub .price-card:nth-child(2) .btn-price',es:'Contactar ventas',en:'Contact sales'},
+  {s:'.cta-section .btn-primary',es:'Mejorar mi foto ahora',en:'Enhance my photo now',hasSvg:true},
+  {s:'#signin-btn + button',es:'Prueba gratis →',en:'Free trial →'}
+];
+
+/* Badge translations */
+var _i18nBadges=[
+  {s:'.pricing-grid .price-card:nth-child(2) .price-badge',es:'Popular',en:'Popular'},
+  {s:'.pricing-grid .price-card:nth-child(3) .price-badge',es:'Mejor valor',en:'Best value'},
+  {s:'.hero-badge',es:'Potenciado por Real-ESRGAN',en:'Powered by Real-ESRGAN',hasSpan:true}
+];
+
 function setLang(lang){
+  _currentLang=lang;
+  localStorage.setItem('p2p_lang',lang);
+  /* Toggle button styles */
   var en=document.getElementById('lt-en');var es=document.getElementById('lt-es');
   if(lang==='en'){if(en){en.style.background='#fff';en.style.color='#000';}if(es){es.style.background='transparent';es.style.color='#8A8A96';}}
   else{if(es){es.style.background='#fff';es.style.color='#000';}if(en){en.style.background='transparent';en.style.color='#8A8A96';}}
+
+  /* Simple text elements */
+  _i18n.forEach(function(item){
+    var el=document.querySelector(item.s);
+    if(el){
+      if(item.html) el.innerHTML=item[lang];
+      else el.textContent=item[lang];
+    }
+  });
+
+  /* List items (pricing features) */
+  Object.keys(_i18nLists).forEach(function(sel){
+    var ul=document.querySelector(sel);
+    if(ul){
+      var lis=ul.querySelectorAll('li');
+      var texts=_i18nLists[sel][lang];
+      lis.forEach(function(li,i){
+        if(texts[i]){
+          var svg=li.querySelector('svg');
+          if(svg){li.innerHTML='';li.appendChild(svg);li.appendChild(document.createTextNode(texts[i]));}
+          else{li.textContent=texts[i];}
+        }
+      });
+    }
+  });
+
+  /* Buttons (preserve SVG icons) */
+  _i18nBtns.forEach(function(item){
+    var el=document.querySelector(item.s);
+    if(el){
+      if(item.hasSvg){
+        var svg=el.querySelector('svg');
+        var nodes=el.childNodes;
+        for(var i=0;i<nodes.length;i++){
+          if(nodes[i].nodeType===3){nodes[i].textContent=item[lang]+' ';break;}
+        }
+        if(!svg){el.textContent=item[lang];}
+      } else {
+        el.textContent=item[lang];
+      }
+    }
+  });
+
+  /* Badges (hero badge has a span inside) */
+  _i18nBadges.forEach(function(item){
+    var el=document.querySelector(item.s);
+    if(el){
+      if(item.hasSpan){
+        var span=el.querySelector('span');
+        var nodes=el.childNodes;
+        for(var i=nodes.length-1;i>=0;i--){
+          if(nodes[i].nodeType===3 && nodes[i].textContent.trim()){
+            nodes[i].textContent='\n                '+item[lang]+'\n            ';
+            break;
+          }
+        }
+      } else {
+        el.textContent=item[lang];
+      }
+    }
+  });
+
+  console.log('🌐 Language set to: '+lang);
+  toast(lang==='en'?'🌐 Language: English':'🌐 Idioma: Español');
 }
+
+/* Apply saved language on load */
+(function(){var saved=localStorage.getItem('p2p_lang');if(saved&&saved!=='es')setTimeout(function(){setLang(saved);},200);})();
 
 /* INIT */
 buildGrid();
