@@ -2386,7 +2386,23 @@ async function runUpscale(){
     var pred=await pollReplicate(res.id||res.prediction_id,btn);
     var outUrl=Array.isArray(pred.output)?pred.output[0]:pred.output;
     if(!outUrl)throw new Error('No output');
-    ST.enhancedURL=outUrl;ST.beforeURL=srcUrl;ST.upscaleDone=true;
+    // Convert external URL to local blob URL so downloads work (avoids CORS)
+    ST.enhancedURL=await new Promise(function(resolve){
+      var eImg=new Image();eImg.crossOrigin='anonymous';
+      eImg.onload=function(){
+        var ec=document.createElement('canvas');ec.width=eImg.naturalWidth;ec.height=eImg.naturalHeight;
+        ec.getContext('2d').drawImage(eImg,0,0);
+        ec.toBlob(function(blob){
+          if(blob){resolve(URL.createObjectURL(blob));}
+          else{resolve(outUrl);}
+        },'image/png');
+      };
+      eImg.onerror=function(){resolve(outUrl);};
+      eImg.src=outUrl;
+    });
+    ST.beforeURL=srcUrl;ST.upscaleDone=true;
+    // Pre-cache with crossOrigin for download
+    try{const _img=new Image();_img.crossOrigin='anonymous';_img.src=outUrl;}catch(e){}
     // Increment usage counter (owner doesn't count)
     if(!isOwner()){var used=parseInt(localStorage.getItem('p2p_used')||'0');localStorage.setItem('p2p_used',String(used+1));}
     showUpscaleResult();
@@ -2736,13 +2752,74 @@ function showResult(a){
   goTo(4);
 }
 
-function downloadResult(){
+async function downloadResult(){
   if(!ST.enhancedURL){toast('Primero aplica el upscale');return;}
-  const a=document.createElement('a');
-  a.href=ST.enhancedURL;
-  a.download=`pix2print_${ST.preset?.id||'enhanced'}_${ST.scale}x_${ST.dpi}dpi.png`;
-  document.body.appendChild(a);a.click();document.body.removeChild(a);
-  toast('⬇ Descargando imagen mejorada…');
+  const fmt=(ST.fmt||'PNG').toUpperCase();
+  const ext=fmt.toLowerCase();
+  const mime=fmt==='JPG'?'image/jpeg':fmt==='WEBP'?'image/webp':'image/png';
+  const qual=fmt==='PNG'?undefined:0.95;
+  const fname=`pix2print_${ST.preset?.id||'enhanced'}_${ST.scale}x_${ST.dpi}dpi.${ext==='jpg'?'jpg':ext}`;
+  toast('⬇ Preparando descarga…');
+
+  // If it's already a data URL or blob URL, download directly
+  if(ST.enhancedURL.startsWith('data:')||ST.enhancedURL.startsWith('blob:')){
+    const a=document.createElement('a');
+    a.href=ST.enhancedURL;a.download=fname;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    toast('✅ Descarga iniciada');return;
+  }
+
+  // For remote URLs: try fetch with no-cors blob, then canvas fallback
+  try{
+    // Method 1: Direct fetch (works if CORS headers present)
+    const resp=await fetch(ST.enhancedURL,{mode:'cors'});
+    if(resp.ok){
+      const blob=await resp.blob();
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download=fname;
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(url),5000);
+      toast('✅ Descarga iniciada');return;
+    }
+  }catch(e){console.log('CORS fetch failed, trying canvas method…');}
+
+  // Method 2: Load image with crossOrigin, draw to canvas, export blob
+  try{
+    const img=new Image();
+    img.crossOrigin='anonymous';
+    await new Promise((resolve,reject)=>{
+      img.onload=resolve;
+      img.onerror=reject;
+      img.src=ST.enhancedURL+'?t='+Date.now(); // cache-bust for CORS retry
+    });
+    const c=document.createElement('canvas');
+    c.width=img.naturalWidth;c.height=img.naturalHeight;
+    c.getContext('2d').drawImage(img,0,0);
+    const blob=await new Promise(r=>c.toBlob(r,mime,qual));
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=fname;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    toast('✅ Descarga iniciada');return;
+  }catch(e){console.log('Canvas method failed, trying proxy…');}
+
+  // Method 3: Use Netlify function as proxy
+  try{
+    const proxyUrl='/.netlify/functions/download-proxy?url='+encodeURIComponent(ST.enhancedURL);
+    const resp=await fetch(proxyUrl);
+    if(resp.ok){
+      const blob=await resp.blob();
+      const url=URL.createObjectURL(blob);
+      const a=document.createElement('a');a.href=url;a.download=fname;
+      document.body.appendChild(a);a.click();document.body.removeChild(a);
+      setTimeout(()=>URL.revokeObjectURL(url),5000);
+      toast('✅ Descarga iniciada');return;
+    }
+  }catch(e){console.log('Proxy method failed');}
+
+  // Final fallback: open in new tab
+  window.open(ST.enhancedURL,'_blank');
+  toast('📥 Imagen abierta en nueva pestaña — clic derecho → Guardar imagen como…');
 }
 
 function selFmt(el,fmt){
