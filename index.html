@@ -2335,7 +2335,7 @@ async function initClerk(){try{await window.Clerk.load();var navMount=document.g
     var navMount2=document.getElementById('clerk-nav-btn2');if(navMount2)window.Clerk.mountUserButton(navMount2);window.Clerk.addListener(function(){updateAuthUI(window.Clerk.user);});updateAuthUI(window.Clerk.user);}catch(e){console.log('Clerk error:',e);}}
 waitForClerk();
 
-var STRIPE_PRICES={pack5:'price_1T4ib1GstLpSKLSjvp1YECYR',pack10:'price_1T4id2GstLpSKLSjPw3cDlKy',pro:'price_1T2JH7GstLpSKLSj7izBAXHp',unlimited:'price_1T2JIDGstLpSKLSjuHRP9K97'};
+var STRIPE_PRICES={pack5:'price_1T2WbHKEnhNr9wQdi3QvcYKx',pack10:'price_1T2Wc4KEnhNr9wQdwI0SH0TN',pro:'price_1T6B8ZKEnhNr9wQdfNz7G2vr',unlimited:'price_1T6BAZKEnhNr9wQd1h4hbWDd'};
 async function startCheckout(planKey){
   if(isOwner()){toast('👑 Owner — acceso ilimitado activo');closeUpgradeModal();return;}
   var priceId=STRIPE_PRICES[planKey];if(!priceId){toast('Plan no válido');return;}
