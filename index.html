@@ -2888,18 +2888,41 @@ function openUpgradeModal(){var m=document.getElementById('upgrade-modal');if(m)
 function closeUpgradeModal(){var m=document.getElementById('upgrade-modal');if(m)m.style.display='none';}
 function openAuthModal(mode){
   var m=document.getElementById('auth-modal');if(m){m.style.display='flex';}
-  // Mount Clerk if available
   var mp=document.getElementById('clerk-mount-point');
   var fb=document.getElementById('clerk-fallback');
-  if(window.Clerk&&mp){
-    mp.innerHTML='';
-    if(mode==='signup')window.Clerk.mountSignUp(mp);
-    else window.Clerk.mountSignIn(mp);
-    if(fb)fb.style.display='none';
-  } else if(mp){
-    mp.style.display='none';
-    if(fb)fb.style.display='block';
+  // Try to mount Clerk widget. Several failure modes possible:
+  //  - Clerk script not yet loaded -> window.Clerk undefined
+  //  - Clerk script loaded but Clerk.load() not yet resolved -> Clerk.loaded === false
+  //  - Mount throws -> show fallback links
+  function showFallback(){if(mp)mp.style.display='none';if(fb)fb.style.display='block';}
+  function showClerk(){if(mp)mp.style.display='block';if(fb)fb.style.display='none';}
+  function tryMount(){
+    if(!mp)return;
+    try{
+      mp.innerHTML='';
+      if(mode==='signup')window.Clerk.mountSignUp(mp);
+      else window.Clerk.mountSignIn(mp);
+      showClerk();
+    }catch(e){console.log('Clerk mount error:',e);showFallback();}
   }
+  if(window.Clerk&&window.Clerk.loaded){tryMount();return;}
+  if(window.Clerk&&!window.Clerk.loaded){
+    // Clerk script loaded but not initialized yet — wait for load
+    showFallback(); // show fallback while waiting so user has something
+    window.Clerk.load().then(function(){tryMount();}).catch(function(e){console.log('Clerk.load error:',e);showFallback();});
+    return;
+  }
+  // Clerk script not yet attached — poll briefly, then fall back
+  showFallback();
+  var attempts=0;
+  var pollId=setInterval(function(){
+    attempts++;
+    if(window.Clerk){
+      clearInterval(pollId);
+      if(window.Clerk.loaded)tryMount();
+      else window.Clerk.load().then(function(){tryMount();}).catch(function(e){console.log('Clerk.load error:',e);showFallback();});
+    }else if(attempts>25){clearInterval(pollId);}
+  },200);
 }
 function closeAuthModal(){var m=document.getElementById('auth-modal');if(m)m.style.display='none';}
 function switchAuthPanel(mode){openAuthModal(mode);}
