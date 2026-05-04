@@ -1712,9 +1712,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 <!-- STEPS -->
 <div class="stepbar">
   <div class="si act" id="si1"><div class="sc">1</div><div class="sl">Subir imagen</div></div>
-  <div class="si" id="si2" style="display:none;"><div class="sc">2</div><div class="sl">Producto</div></div>
-  <div class="si" id="si3"><div class="sc">2</div><div class="sl">Mejorar resolución</div></div>
-  <div class="si" id="si4"><div class="sc">3</div><div class="sl">Descargar</div></div>
+  <div class="si" id="si2"><div class="sc">2</div><div class="sl">Producto</div></div>
+  <div class="si" id="si3"><div class="sc">3</div><div class="sl">Mejorar resolución</div></div>
+  <div class="si" id="si4"><div class="sc">4</div><div class="sl">Descargar</div></div>
 </div>
 
 <!-- Hidden work canvases -->
@@ -1754,7 +1754,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
       </div>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-outline btn-sm" onclick="document.getElementById('file-inp').click()">Cambiar</button>
-        <button class="btn btn-terra" onclick="autoEnhance()">⚡ Mejorar resolución →</button>
+        <button class="btn btn-terra" onclick="goTo(2)">Elegir producto →</button>
       </div>
     </div>
   </div>
@@ -1766,10 +1766,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
   <p class="ss">Selecciona el producto — calculamos exactamente cuánto upscale necesita tu imagen.</p>
   <div class="cat-tabs">
     <div class="ctab on" onclick="filterCat(this,'all')">Todos</div>
-    <div class="ctab" onclick="filterCat(this,'apparel')">👕 Ropa</div>
-    <div class="ctab" onclick="filterCat(this,'mug')">☕ Mugs</div>
-    <div class="ctab" onclick="filterCat(this,'poster')">🖼 Pósters</div>
-    <div class="ctab" onclick="filterCat(this,'paper')">📄 Papel</div>
+    <div class="ctab" onclick="filterCat(this,'apparel')">👕 Camiseta</div>
+    <div class="ctab" onclick="filterCat(this,'mug')">☕ Mug</div>
+    <div class="ctab" onclick="filterCat(this,'photo')">📸 Foto</div>
+    <div class="ctab" onclick="filterCat(this,'poster')">🖼 Póster</div>
     <div class="ctab" onclick="filterCat(this,'other')">⚙ Otro</div>
   </div>
   <div class="pg" id="preset-grid"></div>
@@ -2064,17 +2064,26 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
    PRESETS DB
 ════════════════════════════════════ */
 const PRESETS=[
+  // 👕 CAMISETAS
   {id:'tshirt-front',cat:'apparel',ico:'👕',name:'Camiseta Frente',w:28,h:34,dpi:300,bleed:false,transp:true,shirt:true,pl:'front',note:'DTG frontal'},
   {id:'tshirt-back',cat:'apparel',ico:'↩',name:'Camiseta Espalda',w:28,h:34,dpi:300,bleed:false,transp:true,shirt:true,pl:'back',note:'DTG espalda'},
   {id:'tshirt-chest',cat:'apparel',ico:'◈',name:'Camiseta Pecho',w:10,h:10,dpi:300,bleed:false,transp:true,shirt:true,pl:'left-chest',note:'Pecho izq.'},
-  {id:'mug-std',cat:'mug',ico:'☕',name:'Mug Estándar',w:20,h:9,dpi:300,bleed:false,transp:true,note:'11oz wrap'},
+  // ☕ MUGS
+  {id:'mug-std',cat:'mug',ico:'☕',name:'Mug 11oz',w:20,h:9,dpi:300,bleed:false,transp:true,note:'Estándar wrap'},
+  {id:'mug-15oz',cat:'mug',ico:'🫖',name:'Mug 15oz',w:22,h:9.5,dpi:300,bleed:false,transp:true,note:'Grande wrap'},
   {id:'mug-magic',cat:'mug',ico:'🪄',name:'Mug Mágico',w:20,h:9,dpi:300,bleed:false,transp:true,note:'Color-change'},
+  // 📸 FOTOS
+  {id:'photo-4x6',cat:'photo',ico:'📷',name:'Foto 4×6"',w:10.2,h:15.2,dpi:300,bleed:false,transp:false,note:'10.2×15.2 cm'},
+  {id:'photo-5x7',cat:'photo',ico:'🖼',name:'Foto 5×7"',w:12.7,h:17.8,dpi:300,bleed:false,transp:false,note:'12.7×17.8 cm'},
+  {id:'photo-8x10',cat:'photo',ico:'🖼',name:'Foto 8×10"',w:20.3,h:25.4,dpi:300,bleed:false,transp:false,note:'20.3×25.4 cm'},
+  {id:'photo-letter',cat:'photo',ico:'📄',name:'Foto Carta',w:21.59,h:27.94,dpi:300,bleed:false,transp:false,note:'US Letter'},
+  // 🖼 PÓSTERS
   {id:'poster-a3',cat:'poster',ico:'🖼',name:'Póster A3',w:29.7,h:42,dpi:300,bleed:true,transp:false,note:'+3mm bleed'},
   {id:'poster-30x40',cat:'poster',ico:'🗓',name:'Póster 30×40',w:30,h:40,dpi:300,bleed:true,transp:false,note:'Marco estándar'},
-  {id:'poster-50x70',cat:'poster',ico:'🖼',name:'Póster 50×70',w:50,h:70,dpi:150,bleed:true,transp:false,note:'150 DPI ok'},
-  {id:'letter',cat:'paper',ico:'📄',name:'Carta (Letter)',w:21.59,h:27.94,dpi:300,bleed:false,transp:false,note:'US Letter'},
-  {id:'half-letter',cat:'paper',ico:'📋',name:'Media Carta',w:13.97,h:21.59,dpi:300,bleed:false,transp:false,note:'Half Letter'},
+  {id:'poster-50x70',cat:'poster',ico:'🗺',name:'Póster 50×70',w:50,h:70,dpi:150,bleed:true,transp:false,note:'Gran formato'},
+  // ⚙ OTROS
   {id:'sticker',cat:'other',ico:'🔵',name:'Sticker 3"',w:7.6,h:7.6,dpi:300,bleed:true,transp:true,note:'Die-cut +bleed'},
+  {id:'half-letter',cat:'other',ico:'📋',name:'Media Carta',w:13.97,h:21.59,dpi:300,bleed:false,transp:false,note:'Half Letter'},
   {id:'custom',cat:'other',ico:'⚙',name:'Personalizado',w:null,h:null,dpi:300,bleed:false,transp:false,note:'Medidas propias'},
 ];
 const SIZES={XS:{w:23,h:30},S:{w:25,h:32},M:{w:28,h:34},L:{w:30,h:36},XL:{w:32,h:38},'2XL':{w:34,h:40}};
