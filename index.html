@@ -1311,8 +1311,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
     <p style="font-size:13px;color:#8A8A96;margin-bottom:18px;text-align:center;">5 imágenes gratis. Sin tarjeta requerida.</p>
     <div id="clerk-mount-point" style="min-height:60px;"></div>
     <div id="clerk-fallback" style="display:none;text-align:center;margin-top:12px;">
-      <a href="https://accounts.pix2print.net/sign-in" style="display:block;padding:11px;background:#fff;color:#000;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;margin-bottom:8px;">Iniciar sesión →</a>
-      <a href="https://accounts.pix2print.net/sign-up" style="display:block;padding:11px;background:#08080A;border:1px solid rgba(255,255,255,.12);color:#F2F2F2;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Crear cuenta gratis →</a>
+      <a href="https://pix2print.net/sign-in" style="display:block;padding:11px;background:#fff;color:#000;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;margin-bottom:8px;">Iniciar sesión →</a>
+      <a href="https://pix2print.net/sign-up" style="display:block;padding:11px;background:#08080A;border:1px solid rgba(255,255,255,.12);color:#F2F2F2;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Crear cuenta gratis →</a>
     </div>
     </div>
 </div>
@@ -1712,9 +1712,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 <!-- STEPS -->
 <div class="stepbar">
   <div class="si act" id="si1"><div class="sc">1</div><div class="sl">Subir imagen</div></div>
-  <div class="si" id="si2"><div class="sc">2</div><div class="sl">Producto</div></div>
-  <div class="si" id="si3"><div class="sc">3</div><div class="sl">Mejorar resolución</div></div>
-  <div class="si" id="si4"><div class="sc">4</div><div class="sl">Descargar</div></div>
+  <div class="si" id="si2" style="display:none;"><div class="sc">2</div><div class="sl">Producto</div></div>
+  <div class="si" id="si3"><div class="sc">2</div><div class="sl">Mejorar resolución</div></div>
+  <div class="si" id="si4"><div class="sc">3</div><div class="sl">Descargar</div></div>
 </div>
 
 <!-- Hidden work canvases -->
@@ -1754,7 +1754,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
       </div>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-outline btn-sm" onclick="document.getElementById('file-inp').click()">Cambiar</button>
-        <button class="btn btn-terra" onclick="goTo(2)">Elegir producto →</button>
+        <button class="btn btn-terra" onclick="autoEnhance()">⚡ Mejorar resolución →</button>
       </div>
     </div>
   </div>
@@ -1766,10 +1766,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
   <p class="ss">Selecciona el producto — calculamos exactamente cuánto upscale necesita tu imagen.</p>
   <div class="cat-tabs">
     <div class="ctab on" onclick="filterCat(this,'all')">Todos</div>
-    <div class="ctab" onclick="filterCat(this,'apparel')">👕 Camiseta</div>
-    <div class="ctab" onclick="filterCat(this,'mug')">☕ Mug</div>
-    <div class="ctab" onclick="filterCat(this,'photo')">📸 Foto</div>
-    <div class="ctab" onclick="filterCat(this,'poster')">🖼 Póster</div>
+    <div class="ctab" onclick="filterCat(this,'apparel')">👕 Ropa</div>
+    <div class="ctab" onclick="filterCat(this,'mug')">☕ Mugs</div>
+    <div class="ctab" onclick="filterCat(this,'poster')">🖼 Pósters</div>
+    <div class="ctab" onclick="filterCat(this,'paper')">📄 Papel</div>
     <div class="ctab" onclick="filterCat(this,'other')">⚙ Otro</div>
   </div>
   <div class="pg" id="preset-grid"></div>
@@ -2064,26 +2064,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
    PRESETS DB
 ════════════════════════════════════ */
 const PRESETS=[
-  // 👕 CAMISETAS
   {id:'tshirt-front',cat:'apparel',ico:'👕',name:'Camiseta Frente',w:28,h:34,dpi:300,bleed:false,transp:true,shirt:true,pl:'front',note:'DTG frontal'},
   {id:'tshirt-back',cat:'apparel',ico:'↩',name:'Camiseta Espalda',w:28,h:34,dpi:300,bleed:false,transp:true,shirt:true,pl:'back',note:'DTG espalda'},
   {id:'tshirt-chest',cat:'apparel',ico:'◈',name:'Camiseta Pecho',w:10,h:10,dpi:300,bleed:false,transp:true,shirt:true,pl:'left-chest',note:'Pecho izq.'},
-  // ☕ MUGS
-  {id:'mug-std',cat:'mug',ico:'☕',name:'Mug 11oz',w:20,h:9,dpi:300,bleed:false,transp:true,note:'Estándar wrap'},
-  {id:'mug-15oz',cat:'mug',ico:'🫖',name:'Mug 15oz',w:22,h:9.5,dpi:300,bleed:false,transp:true,note:'Grande wrap'},
+  {id:'mug-std',cat:'mug',ico:'☕',name:'Mug Estándar',w:20,h:9,dpi:300,bleed:false,transp:true,note:'11oz wrap'},
   {id:'mug-magic',cat:'mug',ico:'🪄',name:'Mug Mágico',w:20,h:9,dpi:300,bleed:false,transp:true,note:'Color-change'},
-  // 📸 FOTOS
-  {id:'photo-4x6',cat:'photo',ico:'📷',name:'Foto 4×6"',w:10.2,h:15.2,dpi:300,bleed:false,transp:false,note:'10.2×15.2 cm'},
-  {id:'photo-5x7',cat:'photo',ico:'🖼',name:'Foto 5×7"',w:12.7,h:17.8,dpi:300,bleed:false,transp:false,note:'12.7×17.8 cm'},
-  {id:'photo-8x10',cat:'photo',ico:'🖼',name:'Foto 8×10"',w:20.3,h:25.4,dpi:300,bleed:false,transp:false,note:'20.3×25.4 cm'},
-  {id:'photo-letter',cat:'photo',ico:'📄',name:'Foto Carta',w:21.59,h:27.94,dpi:300,bleed:false,transp:false,note:'US Letter'},
-  // 🖼 PÓSTERS
   {id:'poster-a3',cat:'poster',ico:'🖼',name:'Póster A3',w:29.7,h:42,dpi:300,bleed:true,transp:false,note:'+3mm bleed'},
   {id:'poster-30x40',cat:'poster',ico:'🗓',name:'Póster 30×40',w:30,h:40,dpi:300,bleed:true,transp:false,note:'Marco estándar'},
-  {id:'poster-50x70',cat:'poster',ico:'🗺',name:'Póster 50×70',w:50,h:70,dpi:150,bleed:true,transp:false,note:'Gran formato'},
-  // ⚙ OTROS
+  {id:'poster-50x70',cat:'poster',ico:'🖼',name:'Póster 50×70',w:50,h:70,dpi:150,bleed:true,transp:false,note:'150 DPI ok'},
+  {id:'letter',cat:'paper',ico:'📄',name:'Carta (Letter)',w:21.59,h:27.94,dpi:300,bleed:false,transp:false,note:'US Letter'},
+  {id:'half-letter',cat:'paper',ico:'📋',name:'Media Carta',w:13.97,h:21.59,dpi:300,bleed:false,transp:false,note:'Half Letter'},
   {id:'sticker',cat:'other',ico:'🔵',name:'Sticker 3"',w:7.6,h:7.6,dpi:300,bleed:true,transp:true,note:'Die-cut +bleed'},
-  {id:'half-letter',cat:'other',ico:'📋',name:'Media Carta',w:13.97,h:21.59,dpi:300,bleed:false,transp:false,note:'Half Letter'},
   {id:'custom',cat:'other',ico:'⚙',name:'Personalizado',w:null,h:null,dpi:300,bleed:false,transp:false,note:'Medidas propias'},
 ];
 const SIZES={XS:{w:23,h:30},S:{w:25,h:32},M:{w:28,h:34},L:{w:30,h:36},XL:{w:32,h:38},'2XL':{w:34,h:40}};
@@ -2888,63 +2879,18 @@ function openUpgradeModal(){var m=document.getElementById('upgrade-modal');if(m)
 function closeUpgradeModal(){var m=document.getElementById('upgrade-modal');if(m)m.style.display='none';}
 function openAuthModal(mode){
   var m=document.getElementById('auth-modal');if(m){m.style.display='flex';}
+  // Mount Clerk if available
   var mp=document.getElementById('clerk-mount-point');
   var fb=document.getElementById('clerk-fallback');
-  function showFallback(){if(mp)mp.style.display='none';if(fb)fb.style.display='block';}
-  function showClerk(){if(mp)mp.style.display='block';if(fb)fb.style.display='none';}
-  // CRITICAL: routing:'virtual' makes Clerk render inline (modal) instead of
-  // redirecting the page to /sign-in. Without this Clerk v5 redirects by default
-  // and the modal appears empty for ~1s before the redirect cancels it.
-  var mountOpts={
-    routing:'virtual',
-    afterSignInUrl:window.location.origin+'/?signed_in=1',
-    afterSignUpUrl:window.location.origin+'/?signed_up=1',
-    signInUrl:'#',
-    signUpUrl:'#',
-    appearance:{
-      variables:{
-        colorPrimary:'#F2F2F2',
-        colorBackground:'#131316',
-        colorText:'#F2F2F2',
-        colorInputBackground:'#0E0E11',
-        colorInputText:'#F2F2F2',
-        borderRadius:'8px',
-        fontFamily:"'DM Sans',sans-serif"
-      },
-      elements:{
-        rootBox:{width:'100%'},
-        card:{boxShadow:'none',background:'transparent',border:'none',padding:0},
-        headerTitle:{display:'none'},
-        headerSubtitle:{display:'none'},
-        footer:{background:'transparent'}
-      }
-    }
-  };
-  function tryMount(){
-    if(!mp)return;
-    try{
-      mp.innerHTML='';
-      if(mode==='signup')window.Clerk.mountSignUp(mp,mountOpts);
-      else window.Clerk.mountSignIn(mp,mountOpts);
-      showClerk();
-    }catch(e){console.log('Clerk mount error:',e);showFallback();}
+  if(window.Clerk&&mp){
+    mp.innerHTML='';
+    if(mode==='signup')window.Clerk.mountSignUp(mp);
+    else window.Clerk.mountSignIn(mp);
+    if(fb)fb.style.display='none';
+  } else if(mp){
+    mp.style.display='none';
+    if(fb)fb.style.display='block';
   }
-  if(window.Clerk&&window.Clerk.loaded){tryMount();return;}
-  if(window.Clerk&&!window.Clerk.loaded){
-    showFallback();
-    window.Clerk.load().then(function(){tryMount();}).catch(function(e){console.log('Clerk.load error:',e);showFallback();});
-    return;
-  }
-  showFallback();
-  var attempts=0;
-  var pollId=setInterval(function(){
-    attempts++;
-    if(window.Clerk){
-      clearInterval(pollId);
-      if(window.Clerk.loaded)tryMount();
-      else window.Clerk.load().then(function(){tryMount();}).catch(function(e){console.log('Clerk.load error:',e);showFallback();});
-    }else if(attempts>25){clearInterval(pollId);}
-  },200);
 }
 function closeAuthModal(){var m=document.getElementById('auth-modal');if(m)m.style.display='none';}
 function switchAuthPanel(mode){openAuthModal(mode);}
