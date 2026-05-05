@@ -1712,7 +1712,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
 <!-- STEPS -->
 <div class="stepbar">
   <div class="si act" id="si1"><div class="sc">1</div><div class="sl">Subir imagen</div></div>
-  <div class="si" id="si2" style="display:none;"><div class="sc">2</div><div class="sl">Producto</div></div>
+  <div class="si" id="si2"><div class="sc">2</div><div class="sl">Producto</div></div>
   <div class="si" id="si3"><div class="sc">2</div><div class="sl">Mejorar resolución</div></div>
   <div class="si" id="si4"><div class="sc">3</div><div class="sl">Descargar</div></div>
 </div>
@@ -1754,7 +1754,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
       </div>
       <div style="display:flex;gap:8px;">
         <button class="btn btn-outline btn-sm" onclick="document.getElementById('file-inp').click()">Cambiar</button>
-        <button class="btn btn-terra" onclick="autoEnhance()">⚡ Mejorar resolución →</button>
+        <button class="btn btn-terra" onclick="goTo(2)">Elegir producto →</button>
       </div>
     </div>
   </div>
