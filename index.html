@@ -1311,8 +1311,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;heigh
     <p style="font-size:13px;color:#8A8A96;margin-bottom:18px;text-align:center;">5 imágenes gratis. Sin tarjeta requerida.</p>
     <div id="clerk-mount-point" style="min-height:60px;"></div>
     <div id="clerk-fallback" style="display:none;text-align:center;margin-top:12px;">
-      <a href="https://pix2print.net/sign-in" style="display:block;padding:11px;background:#fff;color:#000;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;margin-bottom:8px;">Iniciar sesión →</a>
-      <a href="https://pix2print.net/sign-up" style="display:block;padding:11px;background:#08080A;border:1px solid rgba(255,255,255,.12);color:#F2F2F2;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Crear cuenta gratis →</a>
+      <a href="https://accounts.pix2print.net/sign-in" style="display:block;padding:11px;background:#fff;color:#000;border-radius:8px;text-decoration:none;font-weight:700;font-size:14px;margin-bottom:8px;">Iniciar sesión →</a>
+      <a href="https://accounts.pix2print.net/sign-up" style="display:block;padding:11px;background:#08080A;border:1px solid rgba(255,255,255,.12);color:#F2F2F2;border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">Crear cuenta gratis →</a>
     </div>
     </div>
 </div>
@@ -2890,29 +2890,51 @@ function openAuthModal(mode){
   var m=document.getElementById('auth-modal');if(m){m.style.display='flex';}
   var mp=document.getElementById('clerk-mount-point');
   var fb=document.getElementById('clerk-fallback');
-  // Try to mount Clerk widget. Several failure modes possible:
-  //  - Clerk script not yet loaded -> window.Clerk undefined
-  //  - Clerk script loaded but Clerk.load() not yet resolved -> Clerk.loaded === false
-  //  - Mount throws -> show fallback links
   function showFallback(){if(mp)mp.style.display='none';if(fb)fb.style.display='block';}
   function showClerk(){if(mp)mp.style.display='block';if(fb)fb.style.display='none';}
+  // CRITICAL: routing:'virtual' makes Clerk render inline (modal) instead of
+  // redirecting the page to /sign-in. Without this Clerk v5 redirects by default
+  // and the modal appears empty for ~1s before the redirect cancels it.
+  var mountOpts={
+    routing:'virtual',
+    afterSignInUrl:window.location.origin+'/?signed_in=1',
+    afterSignUpUrl:window.location.origin+'/?signed_up=1',
+    signInUrl:'#',
+    signUpUrl:'#',
+    appearance:{
+      variables:{
+        colorPrimary:'#F2F2F2',
+        colorBackground:'#131316',
+        colorText:'#F2F2F2',
+        colorInputBackground:'#0E0E11',
+        colorInputText:'#F2F2F2',
+        borderRadius:'8px',
+        fontFamily:"'DM Sans',sans-serif"
+      },
+      elements:{
+        rootBox:{width:'100%'},
+        card:{boxShadow:'none',background:'transparent',border:'none',padding:0},
+        headerTitle:{display:'none'},
+        headerSubtitle:{display:'none'},
+        footer:{background:'transparent'}
+      }
+    }
+  };
   function tryMount(){
     if(!mp)return;
     try{
       mp.innerHTML='';
-      if(mode==='signup')window.Clerk.mountSignUp(mp);
-      else window.Clerk.mountSignIn(mp);
+      if(mode==='signup')window.Clerk.mountSignUp(mp,mountOpts);
+      else window.Clerk.mountSignIn(mp,mountOpts);
       showClerk();
     }catch(e){console.log('Clerk mount error:',e);showFallback();}
   }
   if(window.Clerk&&window.Clerk.loaded){tryMount();return;}
   if(window.Clerk&&!window.Clerk.loaded){
-    // Clerk script loaded but not initialized yet — wait for load
-    showFallback(); // show fallback while waiting so user has something
+    showFallback();
     window.Clerk.load().then(function(){tryMount();}).catch(function(e){console.log('Clerk.load error:',e);showFallback();});
     return;
   }
-  // Clerk script not yet attached — poll briefly, then fall back
   showFallback();
   var attempts=0;
   var pollId=setInterval(function(){
